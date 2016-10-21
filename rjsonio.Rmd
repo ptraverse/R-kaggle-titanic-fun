@@ -1,0 +1,47 @@
+---
+title: "Demo of RJsonIo"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(rStrava)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+#get data on segment ID
+#strava app keys
+strava_client_id = "13234";
+strava_client_secret = "f7ff13f2589f3afe2eec509782e5dcdc3bbf5e0d";s
+strava_app_name = "Bellcurver";
+
+# create the authentication token
+strava_token <- httr::config(token = strava_oauth(strava_app_name, strava_client_id, strava_client_secret))
+
+myinfo <- rStrava.get_athlete(strava_token, id = '2829713')
+head(myinfo)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+

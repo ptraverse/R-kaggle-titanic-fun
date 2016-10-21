@@ -1,0 +1,63 @@
+---
+title: "Kaggle Titanic Training Set - Correlation Analysis"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    social: menu
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(scatterD3)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+setwd('C:\\Users\\Philippe\\workspace\\shinyfun\\shinyfun')
+train = read.csv('train.csv')
+
+selectInput('xcol', 'X Variable', names(train))
+    
+selectInput('ycol', 'Y Variable', names(train),
+                selected=names(train)[[2]])
+    
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+  "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+
+# Combine the selected variables into a new data frame
+selectedData <- reactive({
+  train[, c(input$xcol, input$ycol)]
+})
+
+renderPlot({
+  par(mar = c(5.1, 4.1, 0, 1))
+  plot(selectedData(),
+       pch = 20, cex = 3)
+})
+
+```
+
+
+### Chart C
+
+```{r}
+
+```
+
