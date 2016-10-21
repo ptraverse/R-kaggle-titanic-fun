@@ -1,0 +1,135 @@
+---
+title: "Game Theory Simulation in rMarkdown"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Monty Hall Simulator
+
+We need
+
+* 3 objects { goat, goat, ferrari }
+* an initial pick (default strategy: always go with A)
+* a strategy (i.e. switch or don't switch)
+* a game show host (i.e. a mechanism to remove one of the goat-doors i.e. DEUS EX MACHINA)
+* a result (win/loss)
+* some counters to remember the stats
+
+```{r simulator-switch, echo=TRUE}
+
+run.model <- function(time, switch) {
+  # Runs the Model
+  #
+  # Args:
+  #   time: Number of iterations 
+  #   switch: Boolean of switching strategy 
+  # Returns:
+  #   WinRate (wins/time)
+  #
+  
+  # number of wins counter
+  wins <- c(0)
+  
+  for (i in 1:time) {
+    # get a random ordering of 1,2,3 - 3 represents the FERRARI
+    objs <- sample(1:3)
+    
+    # since its randomly distriubted, KISS, we will always initially pick the first door
+    pick <- objs[1]
+      
+    # reveal a goat-door: choose a SINGLE door that isn't the original pick and isn't the car, and remove it from the set
+    reveal <- objs[objs != pick & objs < 3]   # reveal is copy of objs (WHERE obj != pick AND obj < 3)
+    reveal <- reveal[1]                       # need this line in case reveal is both 1 and 2 
+    objs <- objs[objs != reveal]              # objs is now a copy of itself, minus the single revealed goat-door
+    
+    # implement strategy
+    if (switch) {
+      newPick <- objs[objs != pick]
+    } else {
+      newPick <- pick
+    }
+    
+    # win or lose!
+    if (newPick == 3) {
+      wins = wins + 1
+    } 
+  }
+  
+  message ("Switch Strategy:", switch)
+  message ("Total Wins: ", wins)
+  message ("Out of ", time)
+  
+  return(wins/time)
+}
+```
+
+Now we can run the model (dr evil voice) 1 MILLION times and see what win rate we get for each strategy:
+
+```{r run-switch, echo=TRUE}
+switchWinRate <- run.model(1e+06, TRUE) # Switch TRUE
+switchWinRate
+```
+
+Interesting! My hypothetical value was 1/2 for the switch strategy, but it is actually 2/3. Time to think about it some moar...
+
+```{r run-no-switch, echo=TRUE}
+noSwitchWinRate <- run.model(1e+06, FALSE) # Switch FALSE
+noSwitchWinRate
+```
+
+NoSwitch strategy stayed at 1/3, which was the theoretical value.
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Fig 1.
+
+![Cherry Red Ferrari ... for free !!? ](http://i11.photobucket.com/albums/a197/saito_ichikawa/three-doors-open1.jpg)
+
+```{r}
+
+```
+
+### Background
+
+#### The 3-door switch game (aka the Monty Hall Problem)
+
+There is a game show with 3 doors, 2 have goats and one has a ferrari. The participant picks one of the three. After that the game show host (who knows all 3) picks one of the goat-doors and reveals it. So there are two remaining, both unknown, one of which was the original pick. The challenge is to decide which strategy is best for the participant: either staying with their original choice, or switching to the remaining one.
+
+Spoiler Alert: he should switch. The reason is not intuitive but this might help: **Think of a game of russian roulette. Your opponent spins the chamber and the gun clicks, he passes it to you. Would you prefer to spin or not spin again before taking your turn?**
+
+In both scenarios, the chances are affected by n-1.
+
+#### Project Goals
+
+Calculate (predict) what would the hypothetical numbers look like if we ran this game (the 3 door game)
+
+Ratio of wins / losses given NO SWITCH strategy
+
+Ratio of wins / losses given SWITCH strategy
+
+Run the sim 1000 times with each strategy and see if either the calculation or the program is wrong.
+
+#### Reasoning
+
+Initially each door has a 1/3 chance of being the car. After the first reveal, the 2 remaining doors each have a 1/2 chance of being the car. 
+
+Therefore given a SWITCH strategy the odds of winning should be 50/50.
+
+For a NO SWITCH strategy, the odds of winning will be 1/3, because those were the odds when the choice was committed to.
+
+For the russian roulette game, if it was a 6-shooter, by SPINNING before shooting yourself you reset the odds to 1/6. If you adopt a NO SPINNING strategy your odds are down to 1/5 (since your opponent already got one of the empty chambers).
+
+```{r}
+
+```
+
